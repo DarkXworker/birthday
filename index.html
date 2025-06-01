@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>With Love, For Ritu – Happy Birthday 🎂</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #fef6ff, #dff9fb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .container {
+      text-align: center;
+      background: #ffffffcc;
+      padding: 50px;
+      border-radius: 25px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      max-width: 600px;
+      position: relative;
+    }
+    .birthday-img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .custom-photo {
+      margin-top: 20px;
+      border: 2px dashed #ccc;
+      padding: 10px;
+      border-radius: 15px;
+    }
+    .custom-photo input {
+      width: 100%;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #aaa;
+      cursor: pointer;
+    }
+    h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.7rem;
+      color: #ff4081;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #ff4081;
+      color: #fff;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #e73370;
+    }
+    #popup {
+      background: #fff3f8;
+      padding: 15px;
+      margin-top: 20px;
+      border-radius: 15px;
+      display: none;
+      font-weight: 600;
+      color: #d81b60;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .typing {
+      font-size: 1rem;
+      color: #555;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #ff4081;
+      width: 0;
+      animation: typing 4s steps(40, end) forwards, blink 0.75s step-end infinite;
+    }
+    @keyframes typing {
+      to { width: 100% }
+    }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+    .cake {
+      width: 200px;
+      position: absolute;
+      bottom: -300px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: bottom 2s ease-out;
+      z-index: 1000;
+    }
+    .cake.active {
+      bottom: 20px;
+    }
+    .balloon {
+      position: fixed;
+      bottom: -100px;
+      width: 60px;
+      animation: floatUp 6s linear forwards;
+      z-index: 999;
+      user-select: none;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-150vh); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://cdn.pixabay.com/photo/2020/04/08/14/45/birthday-5016070_960_720.jpg" alt="Happy Birthday" class="birthday-img" />
+    <h1>🎉 With Love, For Ritu – Happy Birthday 🎂</h1>
+    <p class="typing">You are the light in every room, the smile that lifts hearts, and the soul of every celebration. ✨</p>
+    <p>May your day be filled with joy, laughter, and sweet memories you’ll always cherish.</p>
+    <button onclick="showSurprise()">Click for a Surprise 🎁</button>
+
+    <div id="popup">
+      Sudip wishes you a truly magical birthday, Ritu! 💖<br />
+      May all your dreams come true.
+    </div>
+
+    <div class="custom-photo">
+      <label for="file-upload" style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: #ff4081; cursor: pointer;">
+        <img src="https://cdn-icons-png.flaticon.com/512/1051/1051326.png" alt="Upload Icon" style="width: 24px; height: 24px;" />
+        Upload your favorite photo of Ritu 👇
+      </label><br /><br />
+      <input id="file-upload" type="file" accept="image/*" onchange="previewPhoto(event)" />
+      <br /><br />
+      <img id="preview" style="max-width:100%; display:none; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.1);" />
+    </div>
+
+    <img
+      src="https://cdn.pixabay.com/photo/2014/12/21/23/28/cake-576350_960_720.png"
+      alt="cake"
+      class="cake"
+      id="cake"
+    />
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <audio id="song" src="https://www.bensound.com/bensound-music/bensound-buddy.mp3"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <script>
+    function showSurprise() {
+      document.getElementById("popup").style.display = "block";
+      document.getElementById("cake").classList.add("active");
+      startConfetti();
+      playSong();
+      releaseBalloons();
+    }
+
+    function startConfetti() {
+      const duration = 5 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+      const interval = setInterval(function () {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+        confetti(Object.assign({}, defaults, { particleCount: 50 }));
+      }, 250);
+    }
+
+    function playSong() {
+      document.getElementById("song").play();
+    }
+
+    function previewPhoto(event) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const output = document.getElementById("preview");
+        output.src = reader.result;
+        output.style.display = "block";
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+
+    function releaseBalloons() {
+      for (let i = 0; i < 15; i++) {
+        const balloon = document.createElement("img");
+        balloon.src = "https://cdn-icons-png.flaticon.com/512/616/616408.png";
+        balloon.classList.add("balloon");
+        balloon.style.left = Math.random() * 100 + "vw";
+        balloon.style.animationDelay = (i * 0.4) + "s";
+        document.body.appendChild(balloon);
+        setTimeout(() => balloon.remove(), 7000);
+      }
+    }
+  </script>
+</body>
+</html>
